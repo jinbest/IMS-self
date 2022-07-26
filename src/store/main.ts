@@ -4,7 +4,7 @@ configure({ enforceActions: "always" })
 
 export class MainStore {
   app_title = "Hello World"
-  login_status = false
+  login_status = true
 
   constructor() {
     this.load()

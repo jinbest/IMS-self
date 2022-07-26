@@ -5,6 +5,10 @@
   "author": "jin.bestvictoria718@gmail.com",
   "description": "",
   "dependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.9.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -18,6 +22,7 @@
     "express": "^4.18.1",
     "mobx": "^6.6.1",
     "mobx-react": "^7.5.2",
+    "node-sass": "^4.14.1",
     "prettier": "^2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -14,7 +14,7 @@ const Login = () => {
     }
   }, [login_status])
 
-  return <div>{`login page`}</div>
+  return <p>{`login page`}</p>
 }
 
 export default observer(Login)

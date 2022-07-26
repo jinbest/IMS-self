@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "Avenir";
+  src: url("../assets/fonts/Avenir/AvenirLTStd-Book.ttf") format("truetype");
+  ascent-override: 100%;
+  descent-override: 20%;
+  line-gap-override: normal;
+  advance-override: 10;
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: "Avenir Medium";
+  src: url("../assets/fonts/Avenir/AvenirLTStd-Medium.ttf") format("truetype");
+  ascent-override: 100%;
+  descent-override: 20%;
+  line-gap-override: normal;
+  advance-override: 10;
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("../assets/fonts/Manrope/static/Manrope-Regular.ttf") format("truetype");
+  ascent-override: 100%;
+  descent-override: 20%;
+  line-gap-override: normal;
+  advance-override: 10;
+  font-display: fallback;
+}
