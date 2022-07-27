@@ -1,0 +1,39 @@
+.sidebar {
+  margin-left: auto;
+  margin-right: 20px;
+
+  & > button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+}
+
+.sidebar-drawer {
+  padding: 25px 0;
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+
+  .sidebar-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+
+    img {
+      width: 40px;
+    }
+
+    p {
+      font-size: 24px;
+      font-weight: bold;
+      margin-left: 8px;
+      color: #1e1c23;
+    }
+  }
+
+  .sidebar-drawer-footer {
+    margin-top: auto;
+  }
+}

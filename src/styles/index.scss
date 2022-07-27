@@ -1,4 +1,9 @@
 @import url("./font.css");
+@import url("./pages/dashboard.scss");
+@import url("./pages/family.scss");
+@import url("./pages/login.scss");
+@import url("./components/header.scss");
+@import url("./components/sidebar.scss");
 
 body {
   margin: 0;
@@ -34,4 +39,14 @@ a {
   margin: 0;
   padding: 0;
   color: #dce0e8;
+}
+
+.page {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding-top: 60px;
+  z-index: 0;
 }
