@@ -1,8 +1,8 @@
 export interface UserParam {
   id: string
-  first_name: string
-  last_name: string
+  fullname: string
   email: string
   phone?: string
   address?: string
+  is_admin?: boolean
 }

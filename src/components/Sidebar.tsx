@@ -13,11 +13,11 @@ import CloseIcon from "@mui/icons-material/Close"
 import HomeIcon from "@mui/icons-material/Home"
 import LoginIcon from "@mui/icons-material/Login"
 import LogoutIcon from "@mui/icons-material/Logout"
-import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom"
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import { useNavigate } from "react-router-dom"
 import { observer } from "mobx-react"
 import { store } from "../store"
-import logo from "../assets/png/logo.png"
+import logo from "../assets/png/ims_logo2.png"
 
 export const unauthorized_routes = [
   {
@@ -29,9 +29,9 @@ export const unauthorized_routes = [
 
 export const authorized_routes = [
   {
-    name: "Family Tree",
-    icon: () => <FamilyRestroomIcon />,
-    link: "/family",
+    name: "Members",
+    icon: () => <PeopleAltIcon />,
+    link: "/members",
   },
 ]
 
@@ -108,7 +108,6 @@ const Sidebar = () => {
         <div className="sidebar-drawer">
           <div className="sidebar-drawer-header">
             <img src={logo} alt="logo" />
-            <p>Family Story</p>
           </div>
           {list(menu_anchor)}
           <div className="sidebar-drawer-footer" onClick={closeDrawer} onKeyDown={closeDrawer}>

@@ -2,7 +2,7 @@ import React from "react"
 import { Route, Routes, Navigate } from "react-router-dom"
 import RequireAuth from "./RequireAuth"
 import Dashboard from "./pages/dashboard"
-import Family from "./pages/family"
+import Members from "./pages/members"
 import Login from "./pages/login"
 
 const BaseRouter = () => {
@@ -13,10 +13,10 @@ const BaseRouter = () => {
       <Route path="/dashboard" element={<Dashboard />} />
 
       <Route
-        path="/family"
+        path="/members"
         element={
           <RequireAuth>
-            <Family />
+            <Members />
           </RequireAuth>
         }
       />
