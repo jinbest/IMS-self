@@ -1,8 +1,9 @@
 export interface UserParam {
-  id: string
+  id: number
   fullname: string
   email: string
-  phone?: string
-  address?: string
-  is_admin?: boolean
+  // phone?: string
+  // address?: string
+  // is_admin?: boolean
+  // avatar?: string | null
 }

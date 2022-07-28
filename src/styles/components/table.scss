@@ -1,0 +1,21 @@
+.table-row-action {
+  cursor: pointer;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  & > div {
+    width: 35px;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.table-row-col {
+  p {
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
