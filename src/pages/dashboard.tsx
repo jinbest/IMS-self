@@ -1,5 +1,6 @@
 import React from "react"
 import CustomCard from "../components/CustomCard"
+import { observer } from "mobx-react"
 
 const Dashboard = () => {
   return (
@@ -11,4 +12,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default observer(Dashboard)

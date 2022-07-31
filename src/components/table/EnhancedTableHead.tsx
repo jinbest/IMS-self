@@ -11,8 +11,8 @@ import { HeadCellParam, OrderParam } from "../../models/table"
 
 const headCells: readonly HeadCellParam[] = [
   {
-    id: "id",
-    numeric: true,
+    id: "_id",
+    numeric: false,
     disablePadding: true,
     label: "No",
   },
@@ -27,6 +27,30 @@ const headCells: readonly HeadCellParam[] = [
     numeric: false,
     disablePadding: false,
     label: "Email",
+  },
+  {
+    id: "gender",
+    numeric: false,
+    disablePadding: true,
+    label: "Gender",
+  },
+  {
+    id: "birthday",
+    numeric: false,
+    disablePadding: false,
+    label: "Birthday",
+  },
+  {
+    id: "job",
+    numeric: false,
+    disablePadding: false,
+    label: "Job",
+  },
+  {
+    id: "address",
+    numeric: false,
+    disablePadding: false,
+    label: "Address",
   },
 ]
 
@@ -45,6 +69,14 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
     onRequestSort(event, property)
   }
 
+  const isSortable = (key: keyof MemberParam) => {
+    const sortableOptions = ["fullname", "email", "gender", "birthday"]
+    if (sortableOptions.includes(key)) {
+      return true
+    }
+    return false
+  }
+
   return (
     <TableHead>
       <TableRow>
@@ -59,26 +91,36 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
             }}
           />
         </TableCell>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
-            padding={headCell.disablePadding ? "none" : "normal"}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
+        {headCells.map((headCell, index) => (
+          <React.Fragment key={index}>
+            {isSortable(headCell.id) ? (
+              <TableCell
+                align={headCell.numeric ? "right" : "left"}
+                padding={headCell.disablePadding ? "none" : "normal"}
+                sortDirection={orderBy === headCell.id ? order : false}
+              >
+                <TableSortLabel
+                  active={orderBy === headCell.id}
+                  direction={orderBy === headCell.id ? order : "asc"}
+                  onClick={createSortHandler(headCell.id)}
+                >
+                  {headCell.label}
+                  {orderBy === headCell.id ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === "desc" ? "sorted descending" : "sorted ascending"}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              </TableCell>
+            ) : (
+              <TableCell
+                align={headCell.numeric ? "right" : "left"}
+                padding={headCell.disablePadding ? "none" : "normal"}
+              >
+                {headCell.label}
+              </TableCell>
+            )}
+          </React.Fragment>
         ))}
         <TableCell align="right">Action</TableCell>
       </TableRow>

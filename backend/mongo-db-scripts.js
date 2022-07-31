@@ -1,4 +1,5 @@
 const MongoClient = require("mongodb").MongoClient
+const { ObjectId } = require("mongodb")
 const {
   MONGODB_URL: url,
   DB_NAME: dbName,
@@ -28,16 +29,37 @@ MongoClient.connect(url, function (err, client) {
   /* ------------------------------------------------------------------- */
 
   /* ----- 3. db collection: insertMany documents ----- */
-  // const manyObjs = [
-  //   { fullname: "Jin Zheng", email: "jin@thetrackapp.com" },
-  //   { fullname: "Shixiong Han", email: "shixiong@thetrackapp.com" },
-  //   { fullname: "Jeff Jin", email: "jeff@thetrackapp.com" },
-  // ]
-  // db.collection(collectionName).insertMany(manyObjs, function (err, res) {
-  //   if (err) throw err
-  //   console.log("Number of documents inserted: " + res.insertedCount, res)
-  //   client.close()
-  // })
+  const manyObjs = [
+    {
+      fullname: "Jin Zheng",
+      email: "jin@thetrackapp.com",
+      gender: "M",
+      birthday: "1994-07-18",
+      job: "developer",
+      address: "test address1",
+    },
+    {
+      fullname: "Shixiong Han",
+      email: "shixiong@thetrackapp.com",
+      gender: "M",
+      birthday: "1996-01-15",
+      job: "web-developer",
+      address: "test address2",
+    },
+    {
+      fullname: "Xiaoping Jin",
+      email: "jeff@thetrackapp.com",
+      gender: "M",
+      birthday: "1995-02-10",
+      job: "web-developer",
+      address: "test address3",
+    },
+  ]
+  db.collection(collectionName).insertMany(manyObjs, function (err, res) {
+    if (err) throw err
+    console.log("Number of documents inserted: " + res.insertedCount, res)
+    client.close()
+  })
   /* ------------------------------------------------------------------- */
 
   /* ----- 4. db collection: findOne & findAll & find projection ----- */
@@ -55,17 +77,18 @@ MongoClient.connect(url, function (err, client) {
   //     client.close()
   //   })
 
-  db.collection(collectionName)
-    .find({}, { projection: { _id: 0, email: 1, fullname: 1 } })
-    .toArray(function (err, result) {
-      if (err) throw err
-      console.log("result", result)
-      client.close()
-    })
+  // db.collection(collectionName)
+  //   .find({}, { projection: { _id: 0, email: 1, fullname: 1 } })
+  //   .toArray(function (err, result) {
+  //     if (err) throw err
+  //     console.log("result", result)
+  //     client.close()
+  //   })
   /* ------------------------------------------------------------------- */
 
   /* ----- 5. db collection: query ----- */
   // const query = { email: "jinzh718@gmail.com" }
+  // const query = { _id: new ObjectId("62e6cbc59de167e61d08f152") }
   // db.collection(collectionName)
   //   // .find(query)
   //   .find(query, { projection: { _id: 0, email: 1, fullname: 1 } })

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Box from "@mui/material/Box"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
@@ -10,7 +10,7 @@ import Paper from "@mui/material/Paper"
 import Checkbox from "@mui/material/Checkbox"
 import FormControlLabel from "@mui/material/FormControlLabel"
 import Switch from "@mui/material/Switch"
-import { MemberParam } from "../../models/member"
+import { MemberParam, GenderParam } from "../../models/member"
 import { OrderParam } from "../../models/table"
 import { getComparator, stableSort } from "../../utils/table"
 import EnhancedTableHead from "./EnhancedTableHead"
@@ -18,25 +18,34 @@ import EnhancedTableToolbar from "./EnhancedTableToolbar"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
+import { observer } from "mobx-react"
+import { otherStore } from "../../store"
+import ApiClient from "../../services/api-client"
+import Config from "../../config/config"
+import PopupMemberCreate from "./PopupMemberCreate"
 
-const createMember = (fullname: string, email: string, id: number) => {
-  return { id, fullname, email } as MemberParam
+const apiClient = ApiClient.getInstance()
+
+interface EnhancedTableProps {
+  member_rows: MemberParam[]
 }
 
-const member_rows = [
-  createMember("Jin Zheng", "jinzh718@gmail.com", 1),
-  createMember("Shixiong Han", "shixiong@thetrackapp.com", 2),
-]
+const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
+  const { setLoading, setToastParams } = otherStore
 
-const EnhancedTable = () => {
   const [order, setOrder] = useState<OrderParam>("asc")
   const [orderBy, setOrderBy] = useState<keyof MemberParam>("fullname")
-  const [selected, setSelected] = useState<readonly number[]>([])
+  const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
   const [dense, setDense] = useState(false)
   const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [edit_id, setEditId] = useState(-1)
+  const [edit_id, setEditId] = useState("-1")
   const [rows, setRows] = useState<MemberParam[]>(_.cloneDeep(member_rows))
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+
+  useEffect(() => {
+    setRows(_.cloneDeep(member_rows))
+  }, [member_rows])
 
   const handleRequestSort = (e: React.MouseEvent<unknown>, property: keyof MemberParam) => {
     e.preventDefault()
@@ -47,19 +56,19 @@ const EnhancedTable = () => {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.id)
+      const newSelecteds = rows.map((n) => n._id)
       setSelected(newSelecteds)
       return
     }
     setSelected([])
   }
 
-  const handleClick = (id: number) => {
-    const selectedIndex = selected.indexOf(id)
-    let newSelected: readonly number[] = []
+  const handleClick = (_id: string) => {
+    const selectedIndex = selected.indexOf(_id)
+    let newSelected: string[] = []
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id)
+      newSelected = newSelected.concat(selected, _id)
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1))
     } else if (selectedIndex === selected.length - 1) {
@@ -88,11 +97,45 @@ const EnhancedTable = () => {
     setDense(event.target.checked)
   }
 
-  const handleRowAction = (id: number) => {
-    if (edit_id === id) {
-      setEditId(-1)
+  const handleRowAction = (_id: string) => {
+    if (edit_id === _id) {
+      const updatedIndex = _.findIndex(rows, (o) => o._id === _id)
+      if (updatedIndex > -1) {
+        handleUpdateRow(rows[updatedIndex], updatedIndex)
+      }
     } else {
-      setEditId(id)
+      setEditId(_id)
+    }
+  }
+
+  const handleUpdateRow = async (row: MemberParam, index: number) => {
+    setLoading(true)
+    let msg = "One row has been updated successfully.",
+      isFailed = false
+
+    try {
+      const results = await apiClient.put<{ updated: number }>(
+        `${Config.BASE_URL}/members/update/${row._id}`,
+        row
+      )
+      if (results.updated) {
+        rows[index] = _.cloneDeep(row)
+        setRows([...rows])
+      } else {
+        msg = "Nothing has been updated."
+      }
+    } catch (e) {
+      console.log("Something went wrong", e)
+      msg = "Something went wrong to update row data."
+      isFailed = true
+    } finally {
+      setLoading(false)
+      setEditId("-1")
+      setToastParams({
+        msg,
+        isSuccess: !isFailed,
+        isError: isFailed,
+      })
     }
   }
 
@@ -101,7 +144,7 @@ const EnhancedTable = () => {
     keyname: keyof MemberParam
   ) => {
     const newValue = e.target.value
-    const editIndex = _.findIndex(rows, (o) => o.id === edit_id)
+    const editIndex = _.findIndex(rows, (o) => o._id === edit_id)
     if (editIndex > -1) {
       switch (keyname) {
         case "fullname":
@@ -110,6 +153,18 @@ const EnhancedTable = () => {
         case "email":
           rows[editIndex]["email"] = newValue
           break
+        case "gender":
+          rows[editIndex]["gender"] = newValue as GenderParam
+          break
+        case "birthday":
+          rows[editIndex]["birthday"] = newValue
+          break
+        case "job":
+          rows[editIndex]["job"] = newValue
+          break
+        case "address":
+          rows[editIndex]["address"] = newValue
+          break
         default:
           break
       }
@@ -117,8 +172,8 @@ const EnhancedTable = () => {
     }
   }
 
-  const isSelected = (id: number) => selected.indexOf(id) !== -1
-  const isEditable = (id: number) => edit_id === id
+  const isSelected = (_id: string) => selected.indexOf(_id) !== -1
+  const isEditable = (_id: string) => edit_id === _id
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
@@ -126,7 +181,14 @@ const EnhancedTable = () => {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          selected={selected}
+          rows={rows}
+          setRows={setRows}
+          setSelected={setSelected}
+          setShowCreateDialog={setShowCreateDialog}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -145,9 +207,9 @@ const EnhancedTable = () => {
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
               rows.slice().sort(getComparator(order, orderBy)) */}
               {stableSort(rows, getComparator(order, orderBy)).map((row, index) => {
-                const isItemSelected = isSelected(row.id)
+                const isItemSelected = isSelected(row._id)
                 const labelId = `enhanced-table-checkbox-${index}`
-                const isItemEditable = isEditable(row.id)
+                const isItemEditable = isEditable(row._id)
 
                 return (
                   <TableRow
@@ -155,10 +217,10 @@ const EnhancedTable = () => {
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.id}
+                    key={row._id}
                     selected={isItemSelected}
                   >
-                    <TableCell padding="checkbox" onClick={() => handleClick(row.id)}>
+                    <TableCell padding="checkbox" onClick={() => handleClick(row._id)}>
                       <Checkbox
                         color="primary"
                         checked={isItemSelected}
@@ -167,9 +229,11 @@ const EnhancedTable = () => {
                         }}
                       />
                     </TableCell>
-                    <TableCell component="th" id={labelId} scope="row" padding="none" align="right">
-                      {row.id}
+
+                    <TableCell component="th" id={labelId} scope="row" padding="none" align="left">
+                      {index + 1}
                     </TableCell>
+
                     <TableCell align="left">
                       <div className="table-row-col">
                         {!isItemEditable ? (
@@ -185,6 +249,7 @@ const EnhancedTable = () => {
                         )}
                       </div>
                     </TableCell>
+
                     <TableCell align="left">
                       <div className="table-row-col">
                         {!isItemEditable ? (
@@ -200,9 +265,74 @@ const EnhancedTable = () => {
                         )}
                       </div>
                     </TableCell>
+
+                    <TableCell align="left">
+                      <div className="table-row-col">
+                        {!isItemEditable ? (
+                          <p>{row.gender}</p>
+                        ) : (
+                          <input
+                            value={row.gender}
+                            onChange={(e) => {
+                              handleRowItemChange(e, "gender")
+                            }}
+                            placeholder="gender"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell align="left">
+                      <div className="table-row-col">
+                        {!isItemEditable ? (
+                          <p>{row.birthday}</p>
+                        ) : (
+                          <input
+                            value={row.birthday}
+                            onChange={(e) => {
+                              handleRowItemChange(e, "birthday")
+                            }}
+                            placeholder="birthday"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell align="left">
+                      <div className="table-row-col">
+                        {!isItemEditable ? (
+                          <p>{row.job}</p>
+                        ) : (
+                          <input
+                            value={row.job}
+                            onChange={(e) => {
+                              handleRowItemChange(e, "job")
+                            }}
+                            placeholder="job"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell align="left">
+                      <div className="table-row-col">
+                        {!isItemEditable ? (
+                          <p>{row.address}</p>
+                        ) : (
+                          <input
+                            value={row.address}
+                            onChange={(e) => {
+                              handleRowItemChange(e, "address")
+                            }}
+                            placeholder="address"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+
                     <TableCell align="right">
                       <div className="table-row-action">
-                        <div onClick={() => handleRowAction(row.id)}>
+                        <div onClick={() => handleRowAction(row._id)}>
                           {isItemEditable ? <SaveIcon /> : <EditIcon />}
                         </div>
                       </div>
@@ -236,8 +366,9 @@ const EnhancedTable = () => {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
+      <PopupMemberCreate open={showCreateDialog} setOpen={setShowCreateDialog} />
     </Box>
   )
 }
 
-export default EnhancedTable
+export default observer(EnhancedTable)

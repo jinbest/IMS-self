@@ -5,14 +5,72 @@ import Typography from "@mui/material/Typography"
 import IconButton from "@mui/material/IconButton"
 import Tooltip from "@mui/material/Tooltip"
 import DeleteIcon from "@mui/icons-material/Delete"
-import FilterListIcon from "@mui/icons-material/FilterList"
+import AddIcon from "@mui/icons-material/Add"
+import ApiClient from "../../services/api-client"
+import Config from "../../config/config"
+import { observer } from "mobx-react"
+import { otherStore } from "../../store"
+import { MemberParam } from "../../models/member"
+import _ from "lodash"
+
+const apiClient = ApiClient.getInstance()
 
 interface EnhancedTableToolbarProps {
   numSelected: number
+  selected: string[]
+  rows: MemberParam[]
+  setRows: (val: MemberParam[]) => void
+  setSelected: (val: string[]) => void
+  setShowCreateDialog: (val: boolean) => void
 }
 
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { numSelected } = props
+const EnhancedTableToolbar = ({
+  numSelected,
+  selected,
+  rows,
+  setRows,
+  setSelected,
+  setShowCreateDialog,
+}: EnhancedTableToolbarProps) => {
+  const { setLoading, setToastParams } = otherStore
+
+  const onDelete = async (e: React.MouseEvent<unknown>) => {
+    e.preventDefault()
+
+    setLoading(true)
+    let msg = `${numSelected} row(s) deleted.`,
+      isFailed = false
+
+    try {
+      const results = await apiClient.post<{ deleted: number }>(
+        `${Config.BASE_URL}/members/delete`,
+        { ids: selected }
+      )
+      if (results.deleted) {
+        _.remove(rows, (o) => selected.includes(o._id))
+        setRows([...rows])
+        setSelected([])
+      } else {
+        msg = "Nothing has been deleted."
+      }
+    } catch (e) {
+      console.log("Something went wrong", e)
+      msg = "Something went wrong to delete row(s)."
+      isFailed = true
+    } finally {
+      setLoading(false)
+      setToastParams({
+        msg,
+        isSuccess: !isFailed,
+        isError: isFailed,
+      })
+    }
+  }
+
+  const onCreate = (e: React.MouseEvent<unknown>) => {
+    e.preventDefault()
+    setShowCreateDialog(true)
+  }
 
   return (
     <Toolbar
@@ -35,15 +93,16 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        <Tooltip title="Delete" onClick={onDelete}>
           <IconButton>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
+        <Tooltip title="Filter list" onClick={onCreate}>
           <IconButton>
-            <FilterListIcon />
+            <AddIcon />
           </IconButton>
         </Tooltip>
       )}
@@ -51,4 +110,4 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   )
 }
 
-export default EnhancedTableToolbar
+export default observer(EnhancedTableToolbar)
