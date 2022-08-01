@@ -3,7 +3,7 @@ const { ObjectId } = require("mongodb")
 const {
   MONGODB_URL: url,
   DB_NAME: dbName,
-  COLLECTION_NAME: collectionName,
+  COLLECTION_MEMBERS: collectionName,
 } = require("./constants")
 
 MongoClient.connect(url, function (err, client) {

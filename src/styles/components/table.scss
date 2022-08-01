@@ -19,3 +19,18 @@
     color: rgba(0, 0, 0, 0.87);
   }
 }
+
+.create-new-member-popup {
+  width: 500px;
+  max-width: calc(100vw - 40px);
+  margin: auto;
+
+  h2 {
+    color: black;
+  }
+
+  .MuiFormControl-root {
+    margin: 8px 0 !important;
+    width: 100% !important;
+  }
+}

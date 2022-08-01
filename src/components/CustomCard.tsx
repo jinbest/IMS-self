@@ -18,8 +18,6 @@ const CustomCard = ({ children, width, height }: CustomCardProps) => {
         height: height,
         maxHeight: "calc(100vh - 100px)",
         minHeight: 275,
-        background: "rgba(36, 37, 41, 0.7)",
-        border: "1px solid #2b2c31",
         borderRadius: "8px",
       }}
     >

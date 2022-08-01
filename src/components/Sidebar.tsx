@@ -59,7 +59,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     setLoginStatus(false)
-    navigate("/login")
+    navigate("/auth")
   }
 
   const list = (anchor: Anchor) => (
@@ -115,7 +115,7 @@ const Sidebar = () => {
             <List>
               <ListItem disablePadding>
                 {!login_status ? (
-                  <ListItemButton onClick={() => handleRoute("/login")}>
+                  <ListItemButton onClick={() => handleRoute("/auth")}>
                     <ListItemIcon>
                       <LoginIcon />
                     </ListItemIcon>

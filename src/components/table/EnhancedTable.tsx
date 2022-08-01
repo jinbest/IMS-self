@@ -23,6 +23,13 @@ import { otherStore } from "../../store"
 import ApiClient from "../../services/api-client"
 import Config from "../../config/config"
 import PopupMemberCreate from "./PopupMemberCreate"
+import TextField from "@mui/material/TextField"
+import Select from "@mui/material/Select"
+import MenuItem from "@mui/material/MenuItem"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import moment from "moment"
 
 const apiClient = ApiClient.getInstance()
 
@@ -38,7 +45,7 @@ const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
   const [selected, setSelected] = useState<string[]>([])
   const [page, setPage] = useState(0)
   const [dense, setDense] = useState(false)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [edit_id, setEditId] = useState("-1")
   const [rows, setRows] = useState<MemberParam[]>(_.cloneDeep(member_rows))
   const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -139,10 +146,7 @@ const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
     }
   }
 
-  const handleRowItemChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    keyname: keyof MemberParam
-  ) => {
+  const handleRowItemChange = (e: any, keyname: keyof MemberParam) => {
     const newValue = e.target.value
     const editIndex = _.findIndex(rows, (o) => o._id === edit_id)
     if (editIndex > -1) {
@@ -156,9 +160,9 @@ const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
         case "gender":
           rows[editIndex]["gender"] = newValue as GenderParam
           break
-        case "birthday":
-          rows[editIndex]["birthday"] = newValue
-          break
+        // case "birthday":
+        //   rows[editIndex]["birthday"] = newValue
+        //   break
         case "job":
           rows[editIndex]["job"] = newValue
           break
@@ -206,140 +210,192 @@ const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
               rows.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(rows, getComparator(order, orderBy)).map((row, index) => {
-                const isItemSelected = isSelected(row._id)
-                const labelId = `enhanced-table-checkbox-${index}`
-                const isItemEditable = isEditable(row._id)
+              {stableSort(rows, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  const isItemSelected = isSelected(row._id)
+                  const labelId = `enhanced-table-checkbox-${index}`
+                  const isItemEditable = isEditable(row._id)
 
-                return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row._id}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox" onClick={() => handleClick(row._id)}>
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      />
-                    </TableCell>
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row._id}
+                      selected={isItemSelected}
+                    >
+                      <TableCell padding="checkbox" onClick={() => handleClick(row._id)}>
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            "aria-labelledby": labelId,
+                          }}
+                        />
+                      </TableCell>
 
-                    <TableCell component="th" id={labelId} scope="row" padding="none" align="left">
-                      {index + 1}
-                    </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                        align="left"
+                      >
+                        {page * rowsPerPage + index + 1}
+                      </TableCell>
 
-                    <TableCell align="left">
-                      <div className="table-row-col">
-                        {!isItemEditable ? (
-                          <p>{row.fullname}</p>
-                        ) : (
-                          <input
-                            value={row.fullname}
-                            onChange={(e) => {
-                              handleRowItemChange(e, "fullname")
-                            }}
-                            placeholder="fullname"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell align="left">
-                      <div className="table-row-col">
-                        {!isItemEditable ? (
-                          <p>{row.email}</p>
-                        ) : (
-                          <input
-                            value={row.email}
-                            onChange={(e) => {
-                              handleRowItemChange(e, "email")
-                            }}
-                            placeholder="email"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell align="left">
-                      <div className="table-row-col">
-                        {!isItemEditable ? (
-                          <p>{row.gender}</p>
-                        ) : (
-                          <input
-                            value={row.gender}
-                            onChange={(e) => {
-                              handleRowItemChange(e, "gender")
-                            }}
-                            placeholder="gender"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell align="left">
-                      <div className="table-row-col">
-                        {!isItemEditable ? (
-                          <p>{row.birthday}</p>
-                        ) : (
-                          <input
-                            value={row.birthday}
-                            onChange={(e) => {
-                              handleRowItemChange(e, "birthday")
-                            }}
-                            placeholder="birthday"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell align="left">
-                      <div className="table-row-col">
-                        {!isItemEditable ? (
-                          <p>{row.job}</p>
-                        ) : (
-                          <input
-                            value={row.job}
-                            onChange={(e) => {
-                              handleRowItemChange(e, "job")
-                            }}
-                            placeholder="job"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell align="left">
-                      <div className="table-row-col">
-                        {!isItemEditable ? (
-                          <p>{row.address}</p>
-                        ) : (
-                          <input
-                            value={row.address}
-                            onChange={(e) => {
-                              handleRowItemChange(e, "address")
-                            }}
-                            placeholder="address"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell align="right">
-                      <div className="table-row-action">
-                        <div onClick={() => handleRowAction(row._id)}>
-                          {isItemEditable ? <SaveIcon /> : <EditIcon />}
+                      <TableCell align="left">
+                        <div className="table-row-col">
+                          {!isItemEditable ? (
+                            <p>{row.fullname}</p>
+                          ) : (
+                            <TextField
+                              autoFocus
+                              margin="dense"
+                              id="fullname"
+                              // label="Full Name"
+                              placeholder="Full Name"
+                              type="text"
+                              fullWidth
+                              variant="outlined"
+                              value={row.fullname}
+                              onChange={(e) => {
+                                handleRowItemChange(e, "fullname")
+                              }}
+                            />
+                          )}
                         </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
+                      </TableCell>
+
+                      <TableCell align="left">
+                        <div className="table-row-col">
+                          {!isItemEditable ? (
+                            <p>{row.email}</p>
+                          ) : (
+                            <TextField
+                              autoFocus
+                              margin="dense"
+                              id="email"
+                              // label="Email"
+                              placeholder="Email"
+                              type="text"
+                              fullWidth
+                              variant="outlined"
+                              value={row.email}
+                              onChange={(e) => {
+                                handleRowItemChange(e, "email")
+                              }}
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell align="left">
+                        <div className="table-row-col">
+                          {!isItemEditable ? (
+                            <p>{row.gender}</p>
+                          ) : (
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={row.gender}
+                              // label="Gender"
+                              placeholder="Gender"
+                              onChange={(e) => {
+                                handleRowItemChange(e, "gender")
+                              }}
+                            >
+                              <MenuItem value={"M"}>M</MenuItem>
+                              <MenuItem value={"F"}>F</MenuItem>
+                            </Select>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell align="left">
+                        <div className="table-row-col">
+                          {!isItemEditable ? (
+                            <p>{row.birthday}</p>
+                          ) : (
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <DatePicker
+                                label="Birthday"
+                                value={row.birthday}
+                                onChange={(newValue) => {
+                                  if (newValue) {
+                                    const editIndex = _.findIndex(rows, (o) => o._id === edit_id)
+                                    if (editIndex > -1) {
+                                      rows[editIndex]["birthday"] =
+                                        moment(newValue).format("YYYY-MM-DD")
+                                      setRows([...rows])
+                                    }
+                                  }
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            </LocalizationProvider>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell align="left">
+                        <div className="table-row-col">
+                          {!isItemEditable ? (
+                            <p>{row.job}</p>
+                          ) : (
+                            <TextField
+                              autoFocus
+                              margin="dense"
+                              id="job"
+                              // label="Job"
+                              placeholder="Job"
+                              type="text"
+                              fullWidth
+                              variant="outlined"
+                              value={row.job}
+                              onChange={(e) => {
+                                handleRowItemChange(e, "job")
+                              }}
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell align="left">
+                        <div className="table-row-col">
+                          {!isItemEditable ? (
+                            <p>{row.address}</p>
+                          ) : (
+                            <TextField
+                              autoFocus
+                              margin="dense"
+                              id="address"
+                              // label="Address"
+                              placeholder="Address"
+                              type="text"
+                              fullWidth
+                              variant="outlined"
+                              value={row.address}
+                              onChange={(e) => {
+                                handleRowItemChange(e, "address")
+                              }}
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell align="right">
+                        <div className="table-row-action">
+                          <div onClick={() => handleRowAction(row._id)}>
+                            {isItemEditable ? <SaveIcon /> : <EditIcon />}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               {emptyRows > 0 && (
                 <TableRow
                   style={{
@@ -366,7 +422,12 @@ const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-      <PopupMemberCreate open={showCreateDialog} setOpen={setShowCreateDialog} />
+      <PopupMemberCreate
+        open={showCreateDialog}
+        setOpen={setShowCreateDialog}
+        rows={rows}
+        setRows={setRows}
+      />
     </Box>
   )
 }

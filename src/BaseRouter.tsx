@@ -8,7 +8,7 @@ import Login from "./pages/login"
 const BaseRouter = () => {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/auth" element={<Login />} />
 
       <Route path="/dashboard" element={<Dashboard />} />
 

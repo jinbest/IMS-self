@@ -1,10 +1,12 @@
 import { autorun, configure, makeAutoObservable } from "mobx"
+import { UserParam } from "../models/user"
 
 configure({ enforceActions: "always" })
 
 export class MainStore {
   app_title = "Hello World"
   login_status = false
+  user = {} as UserParam
 
   constructor() {
     this.load()
@@ -23,6 +25,7 @@ export class MainStore {
         JSON.stringify({
           app_title: this.app_title,
           login_status: this.login_status,
+          user: this.user,
         })
       )
     }
@@ -50,9 +53,15 @@ export class MainStore {
     this.save()
   }
 
+  setUser = (user: UserParam) => {
+    this.user = user
+    this.save()
+  }
+
   init = () => {
     this.app_title = ""
     this.login_status = false
+    this.user = {} as UserParam
     this.save()
   }
 }

@@ -9,6 +9,31 @@
     justify-content: center;
     flex-direction: column;
 
+    h2 {
+      color: black;
+      margin-bottom: 15px;
+      margin-top: 10px;
+    }
+
+    p {
+      color: rgb(150, 150, 150);
+      margin-top: 15px;
+
+      span {
+        cursor: pointer;
+        color: rgb(0, 174, 255);
+
+        &:hover {
+          opacity: 0.7;
+        }
+      }
+    }
+
+    .MuiFormControl-root {
+      margin: 8px 0 !important;
+      width: 100% !important;
+    }
+
     button {
       margin-top: 25px;
     }
