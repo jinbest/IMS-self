@@ -45,6 +45,15 @@ const PopupMemberCreate = ({ open, setOpen, rows, setRows }: PopupMemberCreatePr
     }
   }, [fullname, email, gender, birthday, job, address])
 
+  const init = () => {
+    setFullName("")
+    setEmail("")
+    setGender("M")
+    setBirthDay("2000-01-01")
+    setJob("")
+    setAddress("")
+  }
+
   const handleSubmit = async (e: React.MouseEvent<unknown>) => {
     e.preventDefault()
     const data = { fullname, email, gender, birthday, job, address }
@@ -75,6 +84,7 @@ const PopupMemberCreate = ({ open, setOpen, rows, setRows }: PopupMemberCreatePr
         isSuccess: !isFailed,
         isError: isFailed,
       })
+      init()
       setOpen(false)
     }
   }
