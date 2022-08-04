@@ -135,4 +135,14 @@ router.post("/login", jsonParser, (req, res) => {
   }
 })
 
+router.put("/update/:username", jsonParser, (req, res) => {
+  const data = cloneDeep(req.body),
+    username = req.params.username
+  console.log("user-update", data, username)
+
+  res.status(200).json({
+    success: true,
+  })
+})
+
 module.exports = router

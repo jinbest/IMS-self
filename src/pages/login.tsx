@@ -7,6 +7,7 @@ import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 import ApiClient from "../services/api-client"
 import Config from "../config/config"
+import { LoginParam, RegisterParam, LoginResParam, RegisterResParam } from "../models/user"
 
 const apiClient = ApiClient.getInstance()
 
@@ -41,7 +42,9 @@ const Login = () => {
     }
   }, [username, password, tab_login, email, confpass])
 
-  const handleAuth = () => {
+  const handleSubmit = (e: any) => {
+    e.preventDefault()
+
     if (tab_login && username && password) {
       onLoginRequest({ username, password })
     } else if (!tab_login && username && password && password === confpass) {
@@ -49,18 +52,13 @@ const Login = () => {
     }
   }
 
-  const onLoginRequest = async (data: { username: string; password: string }) => {
+  const onLoginRequest = async (data: LoginParam) => {
     setLoading(true)
     let msg = "You've been logged in successfully.",
       isFailed = false
 
     try {
-      const results = await apiClient.post<{
-        success: boolean
-        message?: string
-        isAdmin?: boolean
-        email?: string
-      }>(`${Config.BASE_URL}/users/login`, data)
+      const results = await apiClient.post<LoginResParam>(`${Config.BASE_URL}/users/login`, data)
       if (results && results.success) {
         setUser({ username, email: results.email || "", isAdmin: results.isAdmin || false })
         setLoginStatus(true)
@@ -82,18 +80,16 @@ const Login = () => {
     }
   }
 
-  const onRegisterRequest = async (data: { username: string; email: string; password: string }) => {
+  const onRegisterRequest = async (data: RegisterParam) => {
     setLoading(true)
     let msg = "You've been logged in successfully.",
       isFailed = false
 
     try {
-      const results = await apiClient.post<{
-        success: boolean
-        message?: string
-        isAdmin?: boolean
-      }>(`${Config.BASE_URL}/users/register`, data)
-      console.log("onRegisterRequest:results", results)
+      const results = await apiClient.post<RegisterResParam>(
+        `${Config.BASE_URL}/users/register`,
+        data
+      )
 
       if (results && results.success) {
         setUser({ username, email, isAdmin: results.isAdmin || false })
@@ -119,7 +115,7 @@ const Login = () => {
   return (
     <div className="page login">
       <CustomCard width={480} height="fit-content">
-        <div className="login-container">
+        <form className="login-container" onSubmit={handleSubmit}>
           <h2>{tab_login ? "Login" : "Register"}</h2>
 
           <TextField
@@ -179,7 +175,7 @@ const Login = () => {
             />
           )}
 
-          <Button disabled={disabled} variant="outlined" onClick={handleAuth}>
+          <Button disabled={disabled} variant="outlined" type="submit">
             {tab_login ? "Login" : "Register"}
           </Button>
 
@@ -193,7 +189,7 @@ const Login = () => {
               {tab_login ? "register" : "login"}
             </span>
           </p>
-        </div>
+        </form>
       </CustomCard>
     </div>
   )

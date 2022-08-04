@@ -4,7 +4,7 @@ import { UserParam } from "../models/user"
 configure({ enforceActions: "always" })
 
 export class MainStore {
-  app_title = "Hello World"
+  app_title = "IMS (MERN-stack)"
   login_status = false
   user = {} as UserParam
 

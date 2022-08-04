@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import Box from "@mui/material/Box"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
@@ -34,10 +34,11 @@ import moment from "moment"
 const apiClient = ApiClient.getInstance()
 
 interface EnhancedTableProps {
-  member_rows: MemberParam[]
+  rows: MemberParam[]
+  setRows: (val: MemberParam[]) => void
 }
 
-const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
+const EnhancedTable = ({ rows, setRows }: EnhancedTableProps) => {
   const { setLoading, setToastParams } = otherStore
 
   const [order, setOrder] = useState<OrderParam>("asc")
@@ -47,12 +48,7 @@ const EnhancedTable = ({ member_rows }: EnhancedTableProps) => {
   const [dense, setDense] = useState(false)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [edit_id, setEditId] = useState("-1")
-  const [rows, setRows] = useState<MemberParam[]>(_.cloneDeep(member_rows))
   const [showCreateDialog, setShowCreateDialog] = useState(false)
-
-  useEffect(() => {
-    setRows(_.cloneDeep(member_rows))
-  }, [member_rows])
 
   const handleRequestSort = (e: React.MouseEvent<unknown>, property: keyof MemberParam) => {
     e.preventDefault()

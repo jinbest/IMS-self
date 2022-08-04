@@ -1,0 +1,84 @@
+.profile {
+  display: flex;
+  justify-content: center;
+
+  .profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    h2 {
+      color: black;
+      margin-top: 10px;
+    }
+
+    .profile-date-picker {
+      padding-top: 24px;
+      width: 100%;
+
+      .MuiFormControl-root {
+        width: 100%;
+      }
+    }
+  }
+
+  .avatar-uploader-custom {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 15px auto 0;
+
+    img {
+      border-radius: 100px;
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 5;
+    }
+
+    .avatar-dropper {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.5);
+      outline: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 100px;
+    }
+
+    .avatar-dropper-update {
+      background: transparent;
+    }
+
+    .avatar-dropper-remove {
+      position: absolute;
+      z-index: 20;
+      background: transparent;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      top: 0;
+      width: 25px;
+      height: 25px;
+      right: 0;
+    }
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 50px;
+    margin: 15px auto 0px;
+  }
+
+  .profile-action {
+    width: 120px;
+  }
+}

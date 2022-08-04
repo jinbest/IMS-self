@@ -11,6 +11,7 @@ import ListItemText from "@mui/material/ListItemText"
 import MenuIcon from "@mui/icons-material/Menu"
 import CloseIcon from "@mui/icons-material/Close"
 import HomeIcon from "@mui/icons-material/Home"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import LoginIcon from "@mui/icons-material/Login"
 import LogoutIcon from "@mui/icons-material/Logout"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
@@ -32,6 +33,11 @@ export const authorized_routes = [
     name: "Members",
     icon: () => <PeopleAltIcon />,
     link: "/members",
+  },
+  {
+    name: "Profile",
+    icon: () => <AccountCircleIcon />,
+    link: "/profile",
   },
 ]
 
@@ -79,11 +85,8 @@ const Sidebar = () => {
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
-      <Divider />
-      {login_status ? (
-        <React.Fragment>
-          <List>
+        {login_status ? (
+          <React.Fragment>
             {authorized_routes.map((item, index) => (
               <ListItem key={index} disablePadding>
                 <ListItemButton onClick={() => handleRoute(item.link)}>
@@ -92,10 +95,10 @@ const Sidebar = () => {
                 </ListItemButton>
               </ListItem>
             ))}
-          </List>
-          <Divider />
-        </React.Fragment>
-      ) : null}
+          </React.Fragment>
+        ) : null}
+      </List>
+      {/* <Divider /> */}
     </Box>
   )
 

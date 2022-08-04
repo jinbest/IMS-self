@@ -42,10 +42,12 @@ const PopupMemberCreate = ({ open, setOpen, rows, setRows }: PopupMemberCreatePr
   useEffect(() => {
     if (fullname && email && gender && birthday && job && address) {
       setDisabled(false)
+    } else {
+      setDisabled(true)
     }
   }, [fullname, email, gender, birthday, job, address])
 
-  const init = () => {
+  const clear = () => {
     setFullName("")
     setEmail("")
     setGender("M")
@@ -84,7 +86,7 @@ const PopupMemberCreate = ({ open, setOpen, rows, setRows }: PopupMemberCreatePr
         isSuccess: !isFailed,
         isError: isFailed,
       })
-      init()
+      clear()
       setOpen(false)
     }
   }
@@ -94,6 +96,7 @@ const PopupMemberCreate = ({ open, setOpen, rows, setRows }: PopupMemberCreatePr
   }
 
   const handleClose = () => {
+    clear()
     setOpen(false)
   }
 
@@ -183,9 +186,11 @@ const PopupMemberCreate = ({ open, setOpen, rows, setRows }: PopupMemberCreatePr
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose} variant="text">
+            Cancel
+          </Button>
           {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-          <Button disabled={disabled} onClick={handleSubmit}>
+          <Button disabled={disabled} variant="contained" onClick={handleSubmit}>
             Submit
           </Button>
         </DialogActions>

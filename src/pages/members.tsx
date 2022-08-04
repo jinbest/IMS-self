@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import EnhancedTable from "../components/table/EnhancedTable"
 import { MemberParam } from "../models/member"
 import ApiClient from "../services/api-client"
@@ -20,7 +20,14 @@ const apiClient = ApiClient.getInstance()
 
 const Members = () => {
   const { setLoading, setToastParams } = otherStore
+  const membersRef = useRef<MemberParam[]>([])
+
   const [members, setMembers] = useState<MemberParam[]>([])
+
+  const setUpdateMembers = (data: MemberParam[]) => {
+    setMembers([...data])
+    membersRef.current = _.cloneDeep(data)
+  }
 
   useEffect(() => {
     initFetch()
@@ -42,52 +49,55 @@ const Members = () => {
       channel_members.unbind(TRIGER_MEMBER_DELETED)
       channel_members.unbind(TRIGER_MEMBER_UPDATED)
     }
-  }, [members])
+  }, [])
 
   const insertedMember = (data: MemberParam) => {
-    const dataIndex = _.findIndex(members, (o) => o._id === data._id)
+    const cntMembers = _.cloneDeep(membersRef.current)
+    const dataIndex = _.findIndex(cntMembers, (o) => o._id === data._id)
     if (dataIndex === -1) {
-      members.push(data)
-      setMembers([...members])
+      cntMembers.push(data)
+      setUpdateMembers([...cntMembers])
     }
   }
 
   const updatedMember = (data: any) => {
-    const updateIndex = _.findIndex(members, (o) => o._id === data.id)
+    const cntMembers = _.cloneDeep(membersRef.current)
+    const updateIndex = _.findIndex(cntMembers, (o) => o._id === data.id)
     if (updateIndex > -1 && data.updatedFields && !isEmpty(data.updatedFields)) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const keys = Object.keys(data.updatedFields)
       keys.forEach((key) => {
         switch (key) {
           case "fullname":
-            members[updateIndex]["fullname"] = data.updatedFields[key]
+            cntMembers[updateIndex]["fullname"] = data.updatedFields[key]
             break
           case "email":
-            members[updateIndex]["email"] = data.updatedFields[key]
+            cntMembers[updateIndex]["email"] = data.updatedFields[key]
             break
           case "gender":
-            members[updateIndex]["gender"] = data.updatedFields[key]
+            cntMembers[updateIndex]["gender"] = data.updatedFields[key]
             break
           case "birthday":
-            members[updateIndex]["birthday"] = data.updatedFields[key]
+            cntMembers[updateIndex]["birthday"] = data.updatedFields[key]
             break
           case "job":
-            members[updateIndex]["job"] = data.updatedFields[key]
+            cntMembers[updateIndex]["job"] = data.updatedFields[key]
             break
           case "address":
-            members[updateIndex]["address"] = data.updatedFields[key]
+            cntMembers[updateIndex]["address"] = data.updatedFields[key]
             break
         }
       })
-      setMembers([...members])
+      setUpdateMembers([...cntMembers])
     }
   }
 
   const removedMember = (id: string) => {
-    const removeIndex = _.findIndex(members, (o) => o._id === id)
+    const cntMembers = _.cloneDeep(membersRef.current)
+    const removeIndex = _.findIndex(cntMembers, (o) => o._id === id)
     if (removeIndex > -1) {
-      members.splice(removeIndex, 1)
-      setMembers([...members])
+      cntMembers.splice(removeIndex, 1)
+      setUpdateMembers([...cntMembers])
     }
   }
 
@@ -96,7 +106,7 @@ const Members = () => {
 
     try {
       const results = await apiClient.get<MemberParam[]>(`${Config.BASE_URL}/members/list`)
-      setMembers(_.cloneDeep(results))
+      setUpdateMembers(_.cloneDeep(results))
     } catch (e) {
       console.log("Something went wrong", e)
       setToastParams({
@@ -111,7 +121,7 @@ const Members = () => {
   return (
     <div className="page members">
       <div className="members-container">
-        <EnhancedTable member_rows={members} />
+        <EnhancedTable rows={members} setRows={setUpdateMembers} />
       </div>
     </div>
   )
