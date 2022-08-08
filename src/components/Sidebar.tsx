@@ -15,6 +15,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import LoginIcon from "@mui/icons-material/Login"
 import LogoutIcon from "@mui/icons-material/Logout"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
+import ChatIcon from "@mui/icons-material/Chat"
 import { useNavigate } from "react-router-dom"
 import { observer } from "mobx-react"
 import { store } from "../store"
@@ -38,6 +39,11 @@ export const authorized_routes = [
     name: "Profile",
     icon: () => <AccountCircleIcon />,
     link: "/profile",
+  },
+  {
+    name: "Chats",
+    icon: () => <ChatIcon />,
+    link: "/chats",
   },
 ]
 

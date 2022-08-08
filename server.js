@@ -1,11 +1,13 @@
 const express = require("express")
+const app = express()
 const cors = require("cors")({ origin: "*" })
-const Pusher = require("pusher")
+// const Pusher = require("pusher")
+const { Server } = require("socket.io")
 const {
-  PUSHER_APP_ID,
-  PUSHER_APP_KEY,
-  PUSHER_APP_SECRET,
-  PUSHER_APP_CLUSTER,
+  // PUSHER_APP_ID,
+  // PUSHER_APP_KEY,
+  // PUSHER_APP_SECRET,
+  // PUSHER_APP_CLUSTER,
   COLLECTION_MEMBERS,
   MONGODB_BASE,
   RS0_PRIMARY_URL,
@@ -16,6 +18,13 @@ const {
   TRIGER_MEMBER_UPDATED,
 } = require("./backend/constants")
 const MongoClient = require("mongodb").MongoClient
+const http = require("http")
+const server = http.createServer(app)
+const io = new Server(server, {
+  cors: "*",
+  method: ["GET", "POST", "PUT"],
+})
+const PORT = 5001
 
 const { initialConnectMembersDB } = require("./backend/members/connect-db")
 const { initialConnectUsersDB } = require("./backend/users/connect-db")
@@ -24,17 +33,14 @@ const { initialConnectUsersDB } = require("./backend/users/connect-db")
 const membersRouter = require("./backend/members/members")
 const usersRouter = require("./backend/users/users")
 
-const pusher = new Pusher({
-  appId: PUSHER_APP_ID,
-  key: PUSHER_APP_KEY,
-  secret: PUSHER_APP_SECRET,
-  cluster: PUSHER_APP_CLUSTER,
-  useTLS: true,
-})
-const channel = COLLECTION_MEMBERS
-
-const app = express()
-const PORT = 5001
+// const pusher = new Pusher({
+//   appId: PUSHER_APP_ID,
+//   key: PUSHER_APP_KEY,
+//   secret: PUSHER_APP_SECRET,
+//   cluster: PUSHER_APP_CLUSTER,
+//   useTLS: true,
+// })
+// const channel = COLLECTION_MEMBERS
 
 app.use(cors)
 
@@ -69,11 +75,17 @@ const init = async () => {
         // console.log("memberChangeStream", change)
 
         if (change.operationType === "insert") {
-          pusher.trigger(channel, TRIGER_MEMBER_INSERTED, change.fullDocument)
+          // pusher.trigger(channel, TRIGER_MEMBER_INSERTED, change.fullDocument)
+          io.sockets.emit(TRIGER_MEMBER_INSERTED, change.fullDocument)
         } else if (change.operationType === "delete") {
-          pusher.trigger(channel, TRIGER_MEMBER_DELETED, change.documentKey._id)
+          // pusher.trigger(channel, TRIGER_MEMBER_DELETED, change.documentKey._id)
+          io.sockets.emit(TRIGER_MEMBER_DELETED, change.documentKey._id)
         } else if (change.operationType === "update") {
-          pusher.trigger(channel, TRIGER_MEMBER_UPDATED, {
+          // pusher.trigger(channel, TRIGER_MEMBER_UPDATED, {
+          //   id: change.documentKey._id,
+          //   updatedFields: change.updateDescription.updatedFields,
+          // })
+          io.sockets.emit(TRIGER_MEMBER_UPDATED, {
             id: change.documentKey._id,
             updatedFields: change.updateDescription.updatedFields,
           })
@@ -85,5 +97,5 @@ const init = async () => {
 
 init()
 
-app.listen(PORT, () => console.log(`Server listening at port ${PORT}`))
+server.listen(PORT, () => console.log(`Server listening at port ${PORT}`))
 module.exports = app

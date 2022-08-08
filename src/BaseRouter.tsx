@@ -5,6 +5,7 @@ import Dashboard from "./pages/dashboard"
 import Members from "./pages/members"
 import Profile from "./pages/profile"
 import Login from "./pages/login"
+import Chats from "./pages/chats"
 
 const BaseRouter = () => {
   return (
@@ -27,6 +28,15 @@ const BaseRouter = () => {
         element={
           <RequireAuth>
             <Profile />
+          </RequireAuth>
+        }
+      />
+
+      <Route
+        path="/chats"
+        element={
+          <RequireAuth>
+            <Chats />
           </RequireAuth>
         }
       />

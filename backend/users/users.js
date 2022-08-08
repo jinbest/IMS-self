@@ -23,7 +23,10 @@ router.get("/list", (req, res) => {
       const db = client.db(DB_NAME)
 
       db.collection(COLLECTION_USERS)
-        .find({})
+        .find(
+          {},
+          { projection: { _id: 0, email: 1, username: 1, isAdmin: 1, logged_status: 1, avatar: 1 } }
+        )
         .toArray(function (error, result) {
           if (error) throw error
           client.close()

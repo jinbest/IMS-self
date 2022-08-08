@@ -6,9 +6,10 @@ interface CustomCardProps {
   children?: JSX.Element
   width: number | string
   height: number | string
+  minHeight?: number | string
 }
 
-const CustomCard = ({ children, width, height }: CustomCardProps) => {
+const CustomCard = ({ children, width, height, minHeight }: CustomCardProps) => {
   return (
     <Card
       sx={{
@@ -17,7 +18,7 @@ const CustomCard = ({ children, width, height }: CustomCardProps) => {
         minWidth: 275,
         height: height,
         maxHeight: "calc(100vh - 100px)",
-        minHeight: 275,
+        minHeight: minHeight || 275,
         borderRadius: "8px",
       }}
     >
