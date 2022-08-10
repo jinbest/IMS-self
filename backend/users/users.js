@@ -1,11 +1,14 @@
 const express = require("express")
 const cors = require("cors")({ origin: "*" })
 const bodyParser = require("body-parser")
+const Resize = require("../utils/resize")
 const { cloneDeep } = require("lodash")
 const MongoClient = require("mongodb").MongoClient
 const { MONGODB_URL, DB_NAME, COLLECTION_USERS } = require("../constants")
 const jsonParser = bodyParser.json()
 const bcrypt = require("bcrypt")
+const fileUpload = require("express-fileupload")
+const path = require("path")
 
 const salt = bcrypt.genSaltSync(10)
 
@@ -13,6 +16,14 @@ const app = express()
 app.use(cors)
 
 const router = express.Router()
+
+router.use(jsonParser)
+router.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+)
+router.use(fileUpload())
 
 // fetch all users list
 router.get("/list", (req, res) => {
@@ -138,14 +149,27 @@ router.post("/login", jsonParser, (req, res) => {
   }
 })
 
-router.put("/update/:username", jsonParser, (req, res) => {
-  const data = cloneDeep(req.body),
-    username = req.params.username
-  console.log("user-update", data, username)
+router.post("/update/:username", async function (req, res) {
+  const imagePath = path.join(__dirname, "/public/")
+  const fileUpload = new Resize(imagePath)
+  console.log(req.body.content, "image data")
 
-  res.status(200).json({
-    success: true,
-  })
+  if (!req.body.content) {
+    res.status(401).json({ error: "Please provide an image" })
+  }
+
+  const filename = await fileUpload.save(req.body.content.buffer)
+  return res.status(200).json({ name: filename })
 })
+
+// router.post("/update/:username", (req, res) => {
+//   let data = req.body
+
+//   console.log("data", data, data.content)
+
+//   res.status(200).json({
+//     success: true,
+//   })
+// })
 
 module.exports = router

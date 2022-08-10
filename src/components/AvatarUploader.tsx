@@ -6,8 +6,8 @@ import CloseIcon from "@mui/icons-material/Close"
 interface AvatarUploaderProps {
   avatar: string
   setAvatar: (val: string) => void
-  images: never[]
-  setImages: (val: never[]) => void
+  images: any[]
+  setImages: (val: any[]) => void
 }
 
 const AvatarUploader = ({ avatar, setAvatar, images, setImages }: AvatarUploaderProps) => {
@@ -16,7 +16,7 @@ const AvatarUploader = ({ avatar, setAvatar, images, setImages }: AvatarUploader
   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
     // data for submit
     console.log(imageList, addUpdateIndex)
-    setImages(imageList as never[])
+    setImages(imageList as any[])
     if (imageList && imageList.length) {
       setAvatar(imageList[0].dataURL || "")
     }

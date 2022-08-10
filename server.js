@@ -1,6 +1,9 @@
 const express = require("express")
 const app = express()
+const bodyParser = require("body-parser")
 const cors = require("cors")({ origin: "*" })
+const multer = require("multer")
+const fileUpload = require("express-fileupload")
 // const Pusher = require("pusher")
 const { Server } = require("socket.io")
 const {
@@ -41,11 +44,22 @@ const usersRouter = require("./backend/users/users")
 //   useTLS: true,
 // })
 // const channel = COLLECTION_MEMBERS
+const upload = multer()
 
 app.use(cors)
 
 app.use("/members", membersRouter)
 app.use("/users", usersRouter)
+
+app.use(upload.single("content"))
+app.use(bodyParser.json()) // to support JSON-encoded bodies
+app.use(
+  bodyParser.urlencoded({
+    // to support URL-encoded bodies
+    extended: true,
+  })
+)
+app.use(fileUpload())
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*")

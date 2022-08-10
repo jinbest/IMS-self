@@ -25,7 +25,7 @@ const Profile = () => {
   const [edit_status, setEditStatus] = useState(false)
   const [birthday, setBirthDay] = useState(user.birthday || "2000-01-01")
   const [avatar, setAvatar] = useState(user.avatar || "")
-  const [images, setImages] = useState([])
+  const [images, setImages] = useState<any[]>([])
 
   const init = () => {
     setBirthDay(user.birthday || "2000-01-01")
@@ -47,21 +47,37 @@ const Profile = () => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = async () => {
-    setLoading(true)
+    if (!images || !images.length) return
+
+    // setLoading(true)
     let msg = "Your info has been updated successfully.",
       isFailed = false
 
-    const data = {
-      username: user.username,
-      birthday: birthday,
-      avatar: avatar,
+    const option = {
+      headers: {
+        "Content-Type": "multipart/form-data; boundary=XXX",
+      },
     }
 
+    const formData = new FormData()
+    formData.append("username", user.username)
+    formData.append("birthday", birthday)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    formData.append("content", images[0])
+
+    // const data = {
+    //   username: user.username,
+    //   birthday: birthday,
+    //   avatar: avatar,
+    // }
+
     try {
-      const results = await apiClient.put<{ success: boolean }>(
+      const results = await apiClient.post<{ success: boolean }>(
         `${Config.BASE_URL}/users/update/${user.username}`,
-        data
+        formData,
+        option
       )
       if (results.success) {
         user.avatar = avatar
