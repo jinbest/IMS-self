@@ -27,7 +27,6 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "express": "^4.18.1",
-    "express-fileupload": "^1.4.0",
     "http": "0.0.1-security",
     "lodash": "^4.17.21",
     "mobx": "^6.6.1",
@@ -54,9 +53,9 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "set PORT=5000 && react-scripts start",
+    "start": "concurrently \"nodemon server.js\" \"set PORT=5000 && react-scripts start\"",
+    "start:client": "set PORT=5000 && react-scripts start",
     "start:server": "nodemon server.js",
-    "start:both": "concurrently \"nodemon server.js\" \"set PORT=5000 && react-scripts start\"",
     "start:build": "concurrently \"nodemon server.js\" \"nodemon client-server.js\"",
     "build": "react-scripts build",
     "test": "react-scripts test",

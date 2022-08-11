@@ -2,8 +2,6 @@ const express = require("express")
 const app = express()
 const bodyParser = require("body-parser")
 const cors = require("cors")({ origin: "*" })
-const multer = require("multer")
-const fileUpload = require("express-fileupload")
 // const Pusher = require("pusher")
 const { Server } = require("socket.io")
 const {
@@ -44,28 +42,36 @@ const usersRouter = require("./backend/users/users")
 //   useTLS: true,
 // })
 // const channel = COLLECTION_MEMBERS
-const upload = multer()
 
 app.use(cors)
 
 app.use("/members", membersRouter)
 app.use("/users", usersRouter)
 
-app.use(upload.single("content"))
 app.use(bodyParser.json()) // to support JSON-encoded bodies
 app.use(
   bodyParser.urlencoded({
-    // to support URL-encoded bodies
-    extended: true,
+    extended: false,
   })
 )
-app.use(fileUpload())
+app.use("/uploads", express.static("uploads"))
 
 app.use((req, res, next) => {
+  // Error goes via `next()` method
+  // setImmediate(() => {
+  //   next(new Error("Something went wrong"))
+  // })
+
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
   next()
+})
+
+app.use(function (err, req, res, next) {
+  console.error(err.message)
+  if (!err.statusCode) err.statusCode = 500
+  res.status(err.statusCode).send(err.message)
 })
 
 app.get("/", (req, res) => {

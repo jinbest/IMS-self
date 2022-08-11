@@ -1,29 +1,41 @@
 const express = require("express")
-const cors = require("cors")({ origin: "*" })
 const bodyParser = require("body-parser")
-const Resize = require("../utils/resize")
 const { cloneDeep } = require("lodash")
 const MongoClient = require("mongodb").MongoClient
 const { MONGODB_URL, DB_NAME, COLLECTION_USERS } = require("../constants")
 const jsonParser = bodyParser.json()
 const bcrypt = require("bcrypt")
-const fileUpload = require("express-fileupload")
-const path = require("path")
+const multer = require("multer")
 
 const salt = bcrypt.genSaltSync(10)
 
-const app = express()
-app.use(cors)
-
 const router = express.Router()
 
-router.use(jsonParser)
-router.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-)
-router.use(fileUpload())
+const UPLOAD_DIR = "/uploads/"
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `.${UPLOAD_DIR}`)
+  },
+  filename: (req, file, cb) => {
+    const fileName = file.originalname.toLowerCase().split(" ").join("-")
+    cb(null, new Date().getTime() + "-" + fileName)
+  },
+})
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg"
+    ) {
+      cb(null, true)
+    } else {
+      cb(null, false)
+      return cb(new Error("Only .png, .jpg and .jpeg format allowed!"))
+    }
+  },
+})
 
 // fetch all users list
 router.get("/list", (req, res) => {
@@ -58,7 +70,20 @@ router.post("/register", jsonParser, (req, res) => {
   const hashPassword = bcrypt.hashSync(password, salt)
 
   const isAdmin = username === "jinbest" ? true : false
-  const newUser = { username, email, password: hashPassword, logged_status: true, isAdmin }
+
+  const newUser = {
+    username,
+    email,
+    password: hashPassword,
+    logged_status: true,
+    isAdmin,
+    avatar: "",
+    gender: "M",
+    birthday: "2000-01-01",
+    phone: "",
+    career: "",
+    about: "",
+  }
 
   try {
     const query = { username }
@@ -149,27 +174,15 @@ router.post("/login", jsonParser, (req, res) => {
   }
 })
 
-router.post("/update/:username", async function (req, res) {
-  const imagePath = path.join(__dirname, "/public/")
-  const fileUpload = new Resize(imagePath)
-  console.log(req.body.content, "image data")
+/* With file uploader */
+router.post("/update/:username", upload.single("profileImg"), (req, res, next) => {
+  const { username, birthday } = req.body
 
-  if (!req.body.content) {
-    res.status(401).json({ error: "Please provide an image" })
-  }
+  const url = req.protocol + "://" + req.get("host")
+  const avatar_url = url + UPLOAD_DIR + req.file.filename
+  console.log("data", username, birthday, avatar_url)
 
-  const filename = await fileUpload.save(req.body.content.buffer)
-  return res.status(200).json({ name: filename })
+  return res.status(200).json({ success: true })
 })
-
-// router.post("/update/:username", (req, res) => {
-//   let data = req.body
-
-//   console.log("data", data, data.content)
-
-//   res.status(200).json({
-//     success: true,
-//   })
-// })
 
 module.exports = router

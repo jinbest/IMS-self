@@ -38,46 +38,28 @@ const Profile = () => {
     if (!edit_status) {
       setEditStatus(true)
     } else {
-      // handleSubmit()
-      user.avatar = avatar
-      user.birthday = birthday
-      setUser({ ...user })
-      setEditStatus(false)
-      setImages([])
+      handleSubmit()
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = async () => {
     if (!images || !images.length) return
 
-    // setLoading(true)
+    setLoading(true)
     let msg = "Your info has been updated successfully.",
       isFailed = false
-
-    const option = {
-      headers: {
-        "Content-Type": "multipart/form-data; boundary=XXX",
-      },
-    }
 
     const formData = new FormData()
     formData.append("username", user.username)
     formData.append("birthday", birthday)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    formData.append("content", images[0])
-
-    // const data = {
-    //   username: user.username,
-    //   birthday: birthday,
-    //   avatar: avatar,
-    // }
+    formData.append("profileImg", images[0].file)
 
     try {
       const results = await apiClient.post<{ success: boolean }>(
         `${Config.BASE_URL}/users/update/${user.username}`,
         formData,
-        option
+        {}
       )
       if (results.success) {
         user.avatar = avatar
