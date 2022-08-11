@@ -26,7 +26,9 @@ const Login = () => {
 
   useEffect(() => {
     if (login_status) {
-      navigate("/members")
+      setTimeout(() => {
+        navigate("/profile")
+      }, 500)
     }
   }, [login_status])
 
