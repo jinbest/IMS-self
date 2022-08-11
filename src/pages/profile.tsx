@@ -56,13 +56,13 @@ const Profile = () => {
     formData.append("profileImg", images[0].file)
 
     try {
-      const results = await apiClient.post<{ success: boolean }>(
+      const results = await apiClient.post<{ success: boolean; avatar: string }>(
         `${Config.BASE_URL}/users/update/${user.username}`,
         formData,
         {}
       )
       if (results.success) {
-        user.avatar = avatar
+        user.avatar = results.avatar || avatar
         user.birthday = birthday
         setUser({ ...user })
       } else {

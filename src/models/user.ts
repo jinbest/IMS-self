@@ -21,6 +21,13 @@ export interface LoginResParam {
   message?: string
   isAdmin?: boolean
   email?: string
+  avatar?: string
+  phone?: string
+  address?: string
+  career?: string
+  about?: string
+  birthday?: string
+  gender?: string
 }
 
 export interface RegisterParam {

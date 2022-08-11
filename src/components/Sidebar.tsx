@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom"
 import { observer } from "mobx-react"
 import { store } from "../store"
 import logo from "../assets/png/ims_logo2.png"
+import { UserParam } from "../models/user"
 
 export const unauthorized_routes = [
   {
@@ -50,7 +51,7 @@ export const authorized_routes = [
 type Anchor = "top" | "left" | "bottom" | "right"
 
 const Sidebar = () => {
-  const { login_status, setLoginStatus } = store
+  const { login_status, setLoginStatus, setUser } = store
   const menu_anchor = "left" as Anchor
 
   const navigate = useNavigate()
@@ -71,6 +72,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     setLoginStatus(false)
+    setUser({} as UserParam)
     navigate("/auth")
   }
 

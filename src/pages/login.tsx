@@ -60,7 +60,18 @@ const Login = () => {
     try {
       const results = await apiClient.post<LoginResParam>(`${Config.BASE_URL}/users/login`, data)
       if (results && results.success) {
-        setUser({ username, email: results.email || "", isAdmin: results.isAdmin || false })
+        setUser({
+          username,
+          email: results.email || "",
+          isAdmin: results.isAdmin || false,
+          avatar: results.avatar || "",
+          phone: results.phone || "",
+          address: results.address || "",
+          career: results.career || "",
+          about: results.about || "",
+          birthday: results.birthday || "",
+          gender: results.gender || "",
+        })
         setLoginStatus(true)
       } else {
         msg = results.message || "This username does not have an account."
