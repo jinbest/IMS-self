@@ -18,9 +18,13 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import ChatIcon from "@mui/icons-material/Chat"
 import { useNavigate } from "react-router-dom"
 import { observer } from "mobx-react"
-import { store } from "../store"
+import { store, otherStore } from "../store"
 import logo from "../assets/png/ims_logo2.png"
 import { UserParam } from "../models/user"
+import ApiClient from "../services/api-client"
+import Config from "../config/config"
+
+const apiClient = ApiClient.getInstance()
 
 export const unauthorized_routes = [
   {
@@ -51,7 +55,9 @@ export const authorized_routes = [
 type Anchor = "top" | "left" | "bottom" | "right"
 
 const Sidebar = () => {
-  const { login_status, setLoginStatus, setUser } = store
+  const { login_status, setLoginStatus, setUser, user } = store
+  const { setLoading, setToastParams } = otherStore
+
   const menu_anchor = "left" as Anchor
 
   const navigate = useNavigate()
@@ -70,10 +76,37 @@ const Sidebar = () => {
     navigate(link)
   }
 
-  const handleLogout = () => {
-    setLoginStatus(false)
-    setUser({} as UserParam)
-    navigate("/auth")
+  const handleLogout = async () => {
+    let msg = "You've been logged out",
+      isFailed = false
+
+    setLoading(true)
+    try {
+      const results = await apiClient.post<{ success: boolean }>(
+        `${Config.BASE_URL}/users/logout`,
+        { username: user.username }
+      )
+      if (results.success) {
+        setLoading(false)
+        setLoginStatus(false)
+        setUser({} as UserParam)
+        navigate("/auth")
+      } else {
+        msg = "Something went wrong while logging out."
+        isFailed = true
+      }
+    } catch (e) {
+      console.log("Something went wrong", e)
+      msg = "Something went wrong while logging out."
+      isFailed = true
+    } finally {
+      setLoading(false)
+      setToastParams({
+        msg,
+        isSuccess: !isFailed,
+        isError: isFailed,
+      })
+    }
   }
 
   const list = (anchor: Anchor) => (
@@ -133,6 +166,7 @@ const Sidebar = () => {
                     <ListItemText primary={"Log In"} />
                   </ListItemButton>
                 ) : (
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   <ListItemButton onClick={handleLogout}>
                     <ListItemIcon>
                       <LogoutIcon />

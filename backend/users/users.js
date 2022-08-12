@@ -163,7 +163,7 @@ router.post("/login", jsonParser, (req, res) => {
                 newset,
                 function (err_update, res_update) {
                   if (err_update) throw err_update
-                  console.log(`logged_status set as true for ${username}`, res_update)
+                  console.log(`${username}: logged in`, res_update)
 
                   res.status(200).json({
                     success: true,
@@ -189,6 +189,37 @@ router.post("/login", jsonParser, (req, res) => {
             }
           }
         })
+    })
+  } catch (e) {
+    res.status(400).json({
+      message: "Some error occured",
+      e,
+    })
+  }
+})
+
+router.post("/logout", jsonParser, (req, res) => {
+  const data = cloneDeep(req.body)
+  const { username } = data
+
+  try {
+    const query = { username }
+    const newset = { $set: { logged_status: false } }
+
+    MongoClient.connect(MONGODB_URL, function (err, client) {
+      if (err) throw err
+
+      const db = client.db(DB_NAME)
+
+      db.collection(COLLECTION_USERS).updateOne(query, newset, function (err_update, res_update) {
+        if (err_update) throw err_update
+        console.log(`${username}: logged out`, res_update)
+
+        res.status(200).json({
+          success: true,
+        })
+        client.close()
+      })
     })
   } catch (e) {
     res.status(400).json({
